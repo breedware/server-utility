@@ -1,0 +1,35 @@
+{
+  "compilerOptions": {
+    "types": ["node"],
+    /* Target & Module */
+    "target": "ES2022",                          /* Matches modern Node.js 20+ environments */
+    "module": "NodeNext",                        /* Best for ESM and CJS compatibility */
+    "moduleResolution": "NodeNext",
+    "lib": ["ES2022"],
+    
+    /* Output Directives */
+    "outDir": "./dist",                          /* Matches your package.json 'main' */
+    "rootDir": "./src",
+    "declaration": true,                         /* Generates the .d.ts files for 'types' */
+    "declarationMap": true,                      /* Helps users jump to source code in IDEs */
+    "sourceMap": true,                           /* Helpful for debugging in the consumer app */
+    "removeComments": false,                     /* Keep comments for better IntelliSense */
+    
+    /* Strictness & Quality */
+    "strict": true,                              /* Essential for Breedware's code quality */
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "skipLibCheck": true,                        /* Speeds up build; ignores library type issues */
+    
+    /* Interop */
+    "esModuleInterop": true,                     /* Simplifies importing CommonJS modules */
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true                      /* Required for many modern bundlers/transpilers */
+  },
+  "include": ["src"],                       /* Ensures only source code is compiled */
+  "exclude": ["node_modules", "dist", "**/__tests__/*"]
+}
