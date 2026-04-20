@@ -1,14 +1,11 @@
-import { defineString } from "firebase-functions/params";
-
-export const paystackSecret = defineString("PAYSTACK_SECRET");
 
 export class PaystackPayment {
   private _baseUrl = "https://api.paystack.co";
   private _secretKey: string;
 
-  constructor() {
+  constructor(paystackSecret: string) {
     // Secret is initialized once when the class is instantiated
-    this._secretKey = paystackSecret.value();
+    this._secretKey = paystackSecret;
   }
 
   /**

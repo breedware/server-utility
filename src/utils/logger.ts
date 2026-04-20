@@ -1,4 +1,3 @@
-import { realtimeDb } from "../config/server";
 
 
 type LogLevel = 'info' | 'warning' | 'error' | 'debug';
@@ -10,7 +9,7 @@ interface LogParams {
   payload?: any;
   uid?: string | null;
   systemInfo: object;
-  // db: any;
+  db: any;
   onError: (error: any)=>void;
 }
 
@@ -21,13 +20,12 @@ export async function logToFirebase({
   payload = null,
   uid = null,
   systemInfo,
-  // db,
+  db,
   onError
 }: LogParams) {
   try {
     const timestamp = Date.now();
     const dateKey = new Date(timestamp).toISOString().split('T')[0];
-    const db = realtimeDb;
 
     const logData = {
       functionName,

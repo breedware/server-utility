@@ -1,7 +1,5 @@
 import { EmailPayload } from '@breedware/global-utility';
-import { defineString } from 'firebase-functions/params';
 
-const apikey = defineString("EMAIL_API_KEY");
 
 export class EmailMessanger {
   private url = "https://api.brevo.com/v3/smtp/email";
@@ -16,7 +14,7 @@ export class EmailMessanger {
     replyTo,
     carbonCopy,
     blindCarbonCopy,
-  }: EmailPayload) {
+  }: EmailPayload, apiKey: string) {
     this.data.sender = sender;
     this.data.to = receivers;
     this.data.subject = subject;
@@ -29,7 +27,7 @@ export class EmailMessanger {
     this.headers = {
       "Content-Type": "application/json",
       accept: "application/json",
-      "api-key": apikey.value()
+      "api-key": apiKey
     };
   }
 

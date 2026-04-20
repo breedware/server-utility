@@ -1,6 +1,6 @@
 {
   "name": "@breedware/server-utility",
-  "version": "1.0.0",
+  "version": "2.5.1",
   "description": "Server-side utilities for Breedware platforms",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

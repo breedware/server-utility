@@ -1,20 +1,26 @@
-import { defineBoolean, defineString } from "firebase-functions/params";
 
-const secret = defineString("AFRICAS_TALKING_SECRET");
-export const atUsername = defineString("AFRICAS_TALKING_USERNAME");
-const is_dev = defineBoolean("IS_DEV");
-
+interface ASTParam {
+  isDev: boolean;
+  userName: string;
+  secret: string;
+}
 
 export class AfricasTalkingAPI {
-  private _baseUrl = is_dev.value() ? 
-  "https://api.sandbox.africastalking.com/version1"
-  : "https://api.africastalking.com/version1";
+  private _baseUrl;
   private _username: string;
   private _apiKey: string;
 
-  constructor() {
-    this._username = atUsername.value();
-    this._apiKey = secret.value();
+  constructor({
+    isDev,
+    userName,
+    secret
+  }: ASTParam) {
+  this._baseUrl = isDev? 
+  "https://api.sandbox.africastalking.com/version1"
+  : "https://api.africastalking.com/version1";
+    this._username = userName;
+    this._apiKey = secret;
+    this
   }
 
   /**

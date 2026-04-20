@@ -1,19 +1,20 @@
 import { PgBaseModel } from "firebase-admin-ql";
 import { logger } from "firebase-functions";
-import { defineInt, defineString } from "firebase-functions/params";
-import { firestoreDB } from "./server";
+import { Firestore } from "firebase-admin/firestore";
 
-const host = defineString("DBHOST");
-const port = defineInt("DBPORT");
-const dbName = defineString("DBNAME");
-const dbUser = defineString("DBUSER");
-const dbPassword = defineString("DBPASSWORD");
-const dbSsl = defineString("DB_SSL");
+interface DBInit  {
+    host: string;
+    port: number;
+    database: string;
+    user: string
+    password: string;
+    ssl: boolean;
+  };
 
 let knexInstance: any = null;
 
 // ✔️ Create Knex ONLY when needed (runtime)
-function getKnex() {
+function getKnex(param: DBInit) {
   if (!knexInstance) {
     // Dynamically require to ensure it doesn't break during discovery
     const knex = require("knex");
@@ -21,12 +22,8 @@ function getKnex() {
     // Use a try-catch to log EXACTLY what is missing during the Cloud Run boot
     try {
       const connectionConfig = {
-        host: host.value(),
-        port: port.value() || 5432,
-        database: dbName.value(),
-        user: dbUser.value(),
-        password: dbPassword.value(),
-        ssl: dbSsl.value() !== 'undefined' ? { rejectUnauthorized: false } : undefined,
+        ...param,
+        ssl: param.ssl ? { rejectUnauthorized: false } : undefined,
       };
 
       knexInstance = knex({
@@ -43,8 +40,8 @@ function getKnex() {
 }
 
 class BaseDb extends PgBaseModel {
-  constructor(procedure: string, schema: string) {
-    const knex = getKnex();
+  constructor(procedure: string, schema: string, firestoreDB: Firestore, init: DBInit) {
+    const knex = getKnex(init);
 
     super(
       schema,
@@ -78,9 +75,9 @@ interface FetchProcedureProps {
   formData: object;
 }
 
-export const saveToPg = async (param: ProcedureProps): Promise<any> => {
+export const saveToPg = async (param: ProcedureProps, firestoreDB: Firestore, dbInit: DBInit): Promise<any> => {
   try {
-    const db = new BaseDb(param.procedure, param.schema);
+    const db = new BaseDb(param.procedure, param.schema, firestoreDB, dbInit);
     const result = (await db.call({
       formData: { formData: param.formData },
       backups: param.firebaseBackups,
@@ -109,9 +106,9 @@ export const saveToPg = async (param: ProcedureProps): Promise<any> => {
   }
 };
 
-export const fetchFromPg = async (param: FetchProcedureProps): Promise<any> => {
+export const fetchFromPg = async (param: FetchProcedureProps, firestoreDB: Firestore, dbInit: DBInit): Promise<any> => {
   try {
-    const db = new BaseDb('proc_db_fetcher', 'public');
+    const db = new BaseDb('proc_db_fetcher', 'public', firestoreDB, dbInit);
     const result = (await db.call({
       formData: { formData: param.formData },
       backups: (param.formData as any).backups,
@@ -139,5 +136,3 @@ export const fetchFromPg = async (param: FetchProcedureProps): Promise<any> => {
     return false;
   }
 };
-
-export * from './server';
