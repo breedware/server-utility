@@ -39,19 +39,6 @@ function getKnex(param: DBInit) {
   return knexInstance;
 }
 
-class BaseDb extends PgBaseModel {
-  constructor(procedure: string, schema: string, firestoreDB: Firestore, init: DBInit) {
-    const knex = getKnex(init);
-
-    super(
-      schema,
-      procedure,
-      ["formData", "returnValue"],
-      knex,
-      firestoreDB
-    );
-  }
-}
 
 interface ProcedureProps {
   procedure: string;
@@ -75,64 +62,54 @@ interface FetchProcedureProps {
   formData: object;
 }
 
-export const saveToPg = async (param: ProcedureProps, firestoreDB: Firestore, dbInit: DBInit): Promise<any> => {
+export const fetchFromPg = async (param: FetchProcedureProps, firestoreDB: Firestore, dbInit: DBInit): Promise<any> => {
   try {
-    const db = new BaseDb(param.procedure, param.schema, firestoreDB, dbInit);
-    const result = (await db.call({
-      formData: { formData: param.formData },
-      backups: param.firebaseBackups,
-    })) as any;
 
-    const { message, sqlstate, detail, hint, context } = result;
-    logger.log(
-      "message: ",
-      message,
-      " debug: ",
-      result.debugger,
-      " state: ",
-      sqlstate,
-      " details: ",
-      detail,
-      " hint: ",
-      hint,
-      " context: ",
-      context
+    // 1. Ensure Knex is ready
+    const knex = getKnex(dbInit);
+    
+    // 2. Instantiate locally
+    const db = new PgBaseModel(
+       'public',
+       'proc_db_fetcher',
+       ["formData", "returnValue"],
+       knex,
+       firestoreDB
     );
 
-    return result;
+    return await db.call({
+      formData: { formData: param.formData },
+      backups: param.firebaseBackups,
+    });
+    
   } catch (error) {
-    logger.log("saveToPg Error: ", error);
+    logger.log("fetchFromPg Error: ", error);
     return false;
   }
 };
 
-export const fetchFromPg = async (param: FetchProcedureProps, firestoreDB: Firestore, dbInit: DBInit): Promise<any> => {
+// Move the class definition inside the function or make it highly resilient
+export const saveToPg = async (param: ProcedureProps, firestoreDB: Firestore, dbInit: DBInit): Promise<any> => {
   try {
-    const db = new BaseDb('proc_db_fetcher', 'public', firestoreDB, dbInit);
-    const result = (await db.call({
-      formData: { formData: param.formData },
-      backups: (param.formData as any).backups,
-    })) as any;
-
-    const { message, sqlstate, detail, hint, context, status, data } = result;
-    logger.log(
-      "message: ",
-      message,
-      " debug: ",
-      result.debugger,
-      " state: ",
-      sqlstate,
-      " details: ",
-      detail,
-      " hint: ",
-      hint,
-      " context: ",
-      context
+    // 1. Ensure Knex is ready
+    const knex = getKnex(dbInit);
+    
+    // 2. Instantiate locally
+    const db = new PgBaseModel(
+       param.schema,
+       param.procedure,
+       ["formData", "returnValue"],
+       knex,
+       firestoreDB
     );
 
-    return {status, message, data};
+    return await db.call({
+      formData: { formData: param.formData },
+      backups: param.firebaseBackups,
+    });
+
   } catch (error) {
-    logger.log("fetchFromPg Error: ", error);
+    logger.error("saveToPg Runtime Error: ", error);
     return false;
   }
 };

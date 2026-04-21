@@ -1,6 +1,6 @@
 {
   "name": "@breedware/server-utility",
-  "version": "2.5.1",
+  "version": "2.5.2",
   "description": "Server-side utilities for Breedware platforms",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -12,7 +12,6 @@
     "prepare": "npm run build"
   },
   "peerDependencies": {
-    "@breedware/global-utility": ">=1.0.0",
     "firebase-admin": ">=13.0.0",
     "firebase-admin-ql": ">=7.0.0",
     "firebase-functions": ">=7.0.0",

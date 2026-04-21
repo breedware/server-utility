@@ -1,4 +1,13 @@
-import { EmailPayload } from '@breedware/global-utility';
+
+interface EmailPayload {
+    subject: string;
+    content: string;
+    sender: {name: string; email: string;};
+    receivers: {name: string; email: string;}[];
+    replyTo?: {name: string; email: string};
+    carbonCopy?: {name: string; email: string}[];
+    blindCarbonCopy?: {name: string; email: string}[];
+  }
 
 
 export class EmailMessanger {
@@ -6,22 +15,14 @@ export class EmailMessanger {
   private data: any = {};
   private headers: any;
 
-  constructor({
-    subject,
-    content,
-    sender,
-    receivers,
-    replyTo,
-    carbonCopy,
-    blindCarbonCopy,
-  }: EmailPayload, apiKey: string) {
-    this.data.sender = sender;
-    this.data.to = receivers;
-    this.data.subject = subject;
-    this.data.htmlContent = content;
-    this.data.cc = carbonCopy;
-    this.data.bcc = blindCarbonCopy;
-    this.data.replyTo = replyTo;
+  constructor(param: EmailPayload, apiKey: string) {
+    this.data.sender = param.sender;
+    this.data.to = param.receivers;
+    this.data.subject = param.subject;
+    this.data.htmlContent = param.content;
+    this.data.cc = param.carbonCopy;
+    this.data.bcc = param.blindCarbonCopy;
+    this.data.replyTo = param.replyTo;
 
     // ✅ Correct use of param
     this.headers = {
