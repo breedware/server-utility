@@ -1,6 +1,6 @@
 {
   "name": "@breedware/server-utility",
-  "version": "2.5.2",
+  "version": "2.5.3",
   "description": "Server-side utilities for Breedware platforms",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -24,5 +24,8 @@
   },
   "publishConfig": {
     "access": "public"
+  },
+  "dependencies": {
+    "@breedware/global-utility": "^1.2.0"
   }
 }
