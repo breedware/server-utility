@@ -1,4 +1,5 @@
 import { DVAInformation, FundTransferInformation } from "@breedware/global-utility";
+  import crypto from "crypto";
 
 interface Response {status: boolean, message: string}
 
@@ -17,26 +18,56 @@ export class BreedwareService {
   /**
    * Generic Fetcher logic
    */
-  private async _fetcher(path: string, method: "GET" | "POST" | "PUT" | "DELETE" = "GET", body?: object): Promise<any> {
-    try {
-      const response = await fetch(`${this._baseUrl}${path}`, {
-        method,
-        headers: {
-          Authorization: `Bearer ${this._secretKey}`,
-          "Content-Type": "application/json",
-        },
-        body: method !== "GET" && body ? JSON.stringify(body) : undefined,
-      });
+private async _fetcher(
+  path: string,
+  method: "GET" | "POST" | "PUT" | "DELETE" = "GET",
+  body?: object
+): Promise<any> {
+  try {
+    const serializedBody =
+      body ? JSON.stringify(body) : undefined;
 
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(`Breedware API Error: ${(data as any).message || "Unknown Error"}`);
-      }
-      return data;
-    } catch (error) {
-      throw error;
+    const headers: Record<string, string> = {
+      Authorization: `Bearer ${this._secretKey}`,
+      "Content-Type": "application/json",
+    };
+
+    if (serializedBody) {
+      const signature = crypto
+        .createHmac("sha512", this._secretKey)
+        .update(serializedBody)
+        .digest("hex");
+
+      headers["x-breedware-signature"] = signature;
     }
+
+    const response = await fetch(
+      `${this._baseUrl}${path}`,
+      {
+        method,
+        headers,
+        body:
+          method !== "GET" && serializedBody
+            ? serializedBody
+            : undefined,
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        `Breedware API Error: ${
+          (data as any).message || "Unknown Error"
+        }`
+      );
+    }
+
+    return data;
+  } catch (error) {
+    throw error;
   }
+}
 
   /**
    * save dedicated virtual accounts
@@ -46,7 +77,7 @@ export class BreedwareService {
    */
   async saveDVA(data: DVAInformation): Promise<Response> {
     try {
-        await this._fetcher('/dva', "POST", data);
+        await this._fetcher('/dva', "POST", {data});
         return {status: true, message: "DVA created successfully"}
     } catch (error) {
         return {status: false, message: "Unable to save information"}

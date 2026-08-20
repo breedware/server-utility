@@ -20,7 +20,6 @@ export class AfricasTalkingAPI {
   : "https://api.africastalking.com/version1";
     this._username = userName;
     this._apiKey = secret;
-    this
   }
 
   /**
