@@ -126,6 +126,11 @@ export class PaystackPayment {
     return this._fetcher("/dedicated_account/assign", "POST", body);
   }
 
+  async deleteDVA(accountId: string) {
+    // Deactivate Virtual Account
+    return this._fetcher(`/dedicated_account/${accountId}`, "DELETE");
+  }
+
   /** --- TRANSFERS --- **/
 
   async saveTransferRecipient(body: { 
