@@ -98,4 +98,19 @@ private async _fetcher(
         return {status: false, message: "Unable to initiate fund transfer"}
     }
   }
+
+  async saveFundRefund(data: {
+    transactionReference: string;
+    schoolId?: number | null;
+    amount: number;
+    status: string;
+    refundId: number
+  }): Promise<Response> {
+    try {
+        await this._fetcher('/fundrefund', "POST", data);
+        return {status: true, message: "Fund transfer initiated"}
+    } catch (error) {
+        return {status: false, message: "Unable to initiate fund transfer"}
+    }
+  }
 }

@@ -42,6 +42,12 @@ export class PaystackPayment {
     return this._fetcher(`/transaction/verify/${reference}`, "GET");
   }
 
+  async refundPayment(reference: string) {
+    return this._fetcher(`/refund`, "POST", {
+      transaction: reference
+    });
+  }
+
   /** --- BANKS & RESOLUTION --- **/
 
   async fetchBanks() {
