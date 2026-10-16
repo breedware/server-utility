@@ -95,12 +95,31 @@ export class PaystackPayment {
     return this._fetcher("/customer", "POST", body);
   }
 
+  async fetchCustomer(email: string): Promise<{
+    status: boolean;
+    message: string;
+    data?: {
+      "transactions": Array<any>,
+      "subscriptions": Array<any>,
+      "first_name": string | null,
+      "last_name": string | null,
+      "email": string,
+      "phone": string | null,
+      "customer_code": string | null,
+      "id": number,
+      "dedicated_account": string | null,
+    }
+  }> {
+    return this._fetcher(`/customer/${email}`, "GET");
+  }
+
   /** --- DEDICATED VIRTUAL ACCOUNTS (DVA) --- **/
   async createDVA(body: { 
     first_name: string;
     last_name: string;
     preferred_bank?: string;
     customer: string;
+    phone: string;
   }): Promise<{
     status: boolean;
     message: string;
